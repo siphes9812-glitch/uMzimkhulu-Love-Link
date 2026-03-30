@@ -55,8 +55,9 @@ export const ChatList: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-24">
-      <header className="px-6 py-6">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-24 items-center">
+      <div className="w-full max-w-2xl">
+        <header className="px-6 py-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter uppercase italic">Messages</h1>
@@ -166,6 +167,7 @@ export const ChatList: React.FC = () => {
             )}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

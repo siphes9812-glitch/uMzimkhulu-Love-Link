@@ -11,8 +11,9 @@ export const Profile: React.FC = () => {
   if (!profile) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-24">
-      <header className="relative h-[380px] overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-24 items-center">
+      <div className="w-full max-w-2xl">
+        <header className="relative h-[380px] overflow-hidden">
         <motion.img
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
@@ -145,6 +146,7 @@ export const Profile: React.FC = () => {
             <ChevronRight size={20} className="text-red-300" />
           </button>
         </section>
+      </div>
       </div>
     </div>
   );

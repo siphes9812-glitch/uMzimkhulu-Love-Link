@@ -28,8 +28,9 @@ export const Settings: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-24">
-      <header className="flex items-center px-6 py-4 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-20 border-b border-gray-100 dark:border-white/5">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-24 items-center">
+      <div className="w-full max-w-2xl">
+        <header className="flex items-center px-6 py-4 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-20 border-b border-gray-100 dark:border-white/5">
         <button 
           onClick={() => navigate("/profile")} 
           className="p-2.5 -ml-2 bg-gray-50 dark:bg-white/5 rounded-xl text-gray-500 hover:text-brand-500 transition-all active:scale-95"
@@ -114,6 +115,7 @@ export const Settings: React.FC = () => {
           </div>
           <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">Made with passion for true connection</p>
         </div>
+      </div>
       </div>
     </div>
   );

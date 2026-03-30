@@ -55,8 +55,9 @@ export const Onboarding: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen p-6 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
-      <div className="flex items-center justify-between mb-8">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white items-center">
+      <div className="w-full max-w-md flex flex-col min-h-screen p-6">
+        <div className="flex items-center justify-between mb-8">
         {step > 1 ? (
           <button 
             onClick={prevStep} 
@@ -95,7 +96,7 @@ export const Onboarding: React.FC = () => {
               <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">This is how you'll appear on Umzimkhulu Love Link.</p>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-8 max-w-sm">
               <div className="group">
                 <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 group-focus-within:text-brand-500 transition-colors">First Name</label>
                 <input
@@ -116,7 +117,7 @@ export const Onboarding: React.FC = () => {
                     max="100"
                     value={formData.age}
                     onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) })}
-                    className="w-full px-0 py-3 text-2xl font-black bg-transparent border-b-2 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all"
+                    className="w-full max-w-[100px] px-0 py-3 text-2xl font-black bg-transparent border-b-2 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all"
                   />
                 </div>
               </div>
@@ -194,7 +195,7 @@ export const Onboarding: React.FC = () => {
               <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Show off your personality!</p>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-8 max-w-sm">
               <div className="flex justify-center">
                 <div className="relative w-40 h-56 bg-gray-100 dark:bg-white/5 rounded-[2rem] overflow-hidden border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-brand-500/50">
                   <img src={formData.photos[0]} alt="Profile" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
@@ -269,6 +270,7 @@ export const Onboarding: React.FC = () => {
             </>
           )}
         </button>
+      </div>
       </div>
     </div>
   );

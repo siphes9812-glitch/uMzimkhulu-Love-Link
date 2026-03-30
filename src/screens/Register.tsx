@@ -36,30 +36,31 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen p-8 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
-      <button 
-        onClick={() => navigate("/welcome")} 
-        className="p-3 mb-10 -ml-2 w-fit bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-500 hover:text-brand-500 transition-all active:scale-95"
-      >
-        <ChevronLeft size={24} />
-      </button>
-
-      <div className="flex flex-col items-center mb-10 text-center">
-        <motion.div 
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="relative"
+    <div className="flex flex-col min-h-screen p-8 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white items-center justify-center">
+      <div className="w-full max-w-sm">
+        <button 
+          onClick={() => navigate("/welcome")} 
+          className="p-3 mb-8 -ml-2 w-fit bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-500 hover:text-brand-500 transition-all active:scale-95"
         >
-          <div className="absolute inset-0 bg-brand-500 rounded-full blur-2xl opacity-20 animate-pulse" />
-          <div className="relative p-4 bg-brand-500 rounded-[1.5rem] shadow-2xl shadow-brand-500/40">
-            <UserPlus size={32} color="white" fill="white" />
-          </div>
-        </motion.div>
-        <h1 className="mt-8 text-4xl font-black tracking-tighter uppercase italic text-brand-500 leading-none">Join Umzimkhulu Love Link</h1>
-        <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Start your journey to find true love</p>
-      </div>
+          <ChevronLeft size={24} />
+        </button>
 
-      <form onSubmit={handleRegister} className="w-full max-w-sm mx-auto space-y-6">
+        <div className="flex flex-col items-center mb-10 text-center">
+          <motion.div 
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-brand-500 rounded-full blur-2xl opacity-20 animate-pulse" />
+            <div className="relative p-4 bg-brand-500 rounded-[1.5rem] shadow-2xl shadow-brand-500/40">
+              <UserPlus size={32} color="white" fill="white" />
+            </div>
+          </motion.div>
+          <h1 className="mt-8 text-4xl font-black tracking-tighter uppercase italic text-brand-500 leading-none">Join Us</h1>
+          <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Start your journey to find true love</p>
+        </div>
+
+        <form onSubmit={handleRegister} className="space-y-6">
         <div className="space-y-3">
           <div className="relative group">
             <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={18} />
@@ -127,6 +128,7 @@ export const Register: React.FC = () => {
           Already have an account? <Link to="/login" className="text-brand-500 hover:underline">Login</Link>
         </p>
       </form>
+      </div>
     </div>
   );
 };

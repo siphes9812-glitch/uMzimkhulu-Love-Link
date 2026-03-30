@@ -51,8 +51,9 @@ export const EditProfile: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-32">
-      <header className="flex items-center justify-between px-8 py-8 sticky top-0 z-20 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0a0a] pb-32 items-center">
+      <div className="w-full max-w-2xl">
+        <header className="flex items-center justify-between px-8 py-8 sticky top-0 z-20 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5">
         <div className="flex items-center">
           <button 
             onClick={() => navigate("/profile")} 
@@ -104,7 +105,7 @@ export const EditProfile: React.FC = () => {
         </section>
 
         {/* Basic Info */}
-        <section className="space-y-8">
+        <section className="space-y-8 max-w-sm">
           <div className="space-y-3">
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Display Name</label>
             <input
@@ -191,7 +192,7 @@ export const EditProfile: React.FC = () => {
         </section>
 
         {/* Work & Education */}
-        <section className="space-y-8">
+        <section className="space-y-8 max-w-sm">
           <div className="space-y-3">
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Occupation</label>
             <input
@@ -213,6 +214,7 @@ export const EditProfile: React.FC = () => {
             />
           </div>
         </section>
+      </div>
       </div>
     </div>
   );

@@ -38,7 +38,7 @@ export const ChatDetail: React.FC = () => {
 
     const q = query(
       collection(db, "matches", matchId, "messages"),
-      orderBy("createdAt", "asc")
+      orderBy("timestamp", "asc")
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -69,9 +69,9 @@ export const ChatDetail: React.FC = () => {
 
     try {
       await addDoc(collection(db, "matches", matchId, "messages"), {
-        senderUid: profile.uid,
+        senderId: profile.uid,
         text,
-        createdAt: serverTimestamp(),
+        timestamp: serverTimestamp(),
         read: false,
       });
 
@@ -91,8 +91,9 @@ export const ChatDetail: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-[#0a0a0a]">
-      {/* Header */}
+    <div className="flex flex-col h-screen bg-white dark:bg-[#0a0a0a] items-center">
+      <div className="w-full max-w-2xl flex flex-col h-screen relative">
+        {/* Header */}
       <header className="glass sticky top-0 z-20 flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5">
         <div className="flex items-center">
           <button onClick={() => navigate("/chats")} className="p-2 -ml-2 text-gray-400 hover:text-brand-500 transition-all">
@@ -135,9 +136,9 @@ export const ChatDetail: React.FC = () => {
         </div>
 
         {messages.map((msg, index) => {
-          const isMe = msg.senderUid === profile?.uid;
+          const isMe = msg.senderId === profile?.uid;
           const showTime = index === messages.length - 1 || 
-            (messages[index + 1] && messages[index + 1].senderUid !== msg.senderUid);
+            (messages[index + 1] && messages[index + 1].senderId !== msg.senderId);
 
           return (
             <div
@@ -155,7 +156,7 @@ export const ChatDetail: React.FC = () => {
               </div>
               {showTime && (
                 <span className="text-[8px] mt-1 text-gray-400 font-bold uppercase tracking-widest px-2">
-                  {msg.createdAt && format(new Date(msg.createdAt.toString()), "HH:mm")}
+                  {msg.timestamp && format(new Date(msg.timestamp.toString()), "HH:mm")}
                 </span>
               )}
             </div>
@@ -192,6 +193,7 @@ export const ChatDetail: React.FC = () => {
             <Send size={20} fill="white" className="ml-1" />
           </button>
         </form>
+      </div>
       </div>
     </div>
   );

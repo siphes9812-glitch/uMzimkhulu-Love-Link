@@ -12,12 +12,15 @@ service cloud.firestore {
     //   - uid: string (required, immutable) - The unique identifier for the user.
     //   - displayName: string (required, min: 1, max: 50) - The user's display name.
     //   - email: string (required, format: email) - The user's email address.
-    //   - photoURL: string (optional, format: url) - The URL of the user's profile picture.
+    //   - photos: list (optional, items: url) - URLs of the user's profile pictures.
     //   - bio: string (optional, max: 500) - A short biography of the user.
     //   - age: number (optional, min: 18, max: 120) - The user's age.
     //   - gender: string (optional, enum: ['male', 'female', 'other']) - The user's gender.
-    //   - interestedIn: list (optional, max: 3) - Genders the user is interested in.
-    //   - location: string (optional, max: 100) - The user's location.
+    //   - interestedIn: string (optional, enum: ['male', 'female', 'both']) - Gender the user is interested in.
+    //   - interests: list (optional, items: string) - User's interests.
+    //   - location: map (optional) - The user's location {city, latitude, longitude}.
+    //   - occupation: string (optional) - User's job.
+    //   - education: string (optional) - User's education.
     //   - role: string (required, enum: ['user', 'admin']) - The user's role.
     //   - createdAt: timestamp (required, immutable) - When the profile was created.
     //   - updatedAt: timestamp (required) - When the profile was last updated.
@@ -25,10 +28,11 @@ service cloud.firestore {
     // Collection: matches
     // Document ID: {matchId}
     // Fields:
+    //   - id: string (required, immutable) - The match ID.
     //   - users: list (required, size: 2) - The UIDs of the two matched users.
-    //   - timestamp: timestamp (required, immutable) - When the match occurred.
+    //   - createdAt: timestamp (required, immutable) - When the match occurred.
     //   - lastMessage: string (optional, max: 1000) - The content of the last message.
-    //   - lastMessageTimestamp: timestamp (optional) - When the last message was sent.
+    //   - lastMessageAt: timestamp (optional) - When the last message was sent.
     //
     // Collection: matches/{matchId}/messages
     // Document ID: {messageId}
@@ -36,6 +40,7 @@ service cloud.firestore {
     //   - senderId: string (required, immutable) - The UID of the sender.
     //   - text: string (required, min: 1, max: 1000) - The message text.
     //   - timestamp: timestamp (required, immutable) - When the message was sent.
+    //   - read: bool (optional) - Whether the message has been read.
     //
     // ===============================================================
 
@@ -83,37 +88,42 @@ service cloud.firestore {
 
     function isValidUser(data) {
       return hasRequiredFields(['uid', 'displayName', 'email', 'role', 'createdAt', 'updatedAt']) &&
-             hasOnlyAllowedFields(['uid', 'displayName', 'email', 'photoURL', 'bio', 'age', 'gender', 'interestedIn', 'location', 'role', 'createdAt', 'updatedAt']) &&
+             hasOnlyAllowedFields(['uid', 'displayName', 'email', 'photos', 'bio', 'age', 'gender', 'interestedIn', 'interests', 'location', 'occupation', 'education', 'role', 'createdAt', 'updatedAt']) &&
              data.uid == request.auth.uid &&
              data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 50 &&
              isValidEmail(data.email) &&
-             (!('photoURL' in data) || isValidUrl(data.photoURL)) &&
-             (!('bio' in data) || (data.bio is string && data.bio.size() <= 500)) &&
+             (!('photos' in data) || (data.photos is list && data.photos.size() <= 10)) &&
+             (!('bio' in data) || (data.bio is string && data.bio.size() <= 1000)) &&
              (!('age' in data) || (data.age is number && data.age >= 18 && data.age <= 120)) &&
              (!('gender' in data) || data.gender in ['male', 'female', 'other']) &&
-             (!('interestedIn' in data) || (data.interestedIn is list && data.interestedIn.size() <= 3)) &&
-             (!('location' in data) || (data.location is string && data.location.size() <= 100)) &&
+             (!('interestedIn' in data) || data.interestedIn in ['male', 'female', 'both']) &&
+             (!('interests' in data) || (data.interests is list && data.interests.size() <= 20)) &&
+             (!('location' in data) || (data.location is map && ('city' in data.location) && data.location.city is string)) &&
+             (!('occupation' in data) || (data.occupation is string && data.occupation.size() <= 100)) &&
+             (!('education' in data) || (data.education is string && data.education.size() <= 100)) &&
              data.role in ['user', 'admin'] &&
              data.createdAt is timestamp &&
              data.updatedAt is timestamp;
     }
 
     function isValidMatch(data) {
-      return hasRequiredFields(['users', 'timestamp']) &&
-             hasOnlyAllowedFields(['users', 'timestamp', 'lastMessage', 'lastMessageTimestamp']) &&
+      return hasRequiredFields(['id', 'users', 'createdAt']) &&
+             hasOnlyAllowedFields(['id', 'users', 'createdAt', 'lastMessage', 'lastMessageAt']) &&
+             data.id is string &&
              data.users is list && data.users.size() == 2 &&
              request.auth.uid in data.users &&
-             data.timestamp is timestamp &&
-             (!('lastMessage' in data) || (data.lastMessage is string && data.lastMessage.size() <= 1000)) &&
-             (!('lastMessageTimestamp' in data) || data.lastMessageTimestamp is timestamp);
+             data.createdAt is timestamp &&
+             (!('lastMessage' in data) || data.lastMessage == null || (data.lastMessage is string && data.lastMessage.size() <= 1000)) &&
+             (!('lastMessageAt' in data) || data.lastMessageAt is timestamp);
     }
 
     function isValidMessage(data) {
       return hasRequiredFields(['senderId', 'text', 'timestamp']) &&
-             hasOnlyAllowedFields(['senderId', 'text', 'timestamp']) &&
+             hasOnlyAllowedFields(['senderId', 'text', 'timestamp', 'read']) &&
              data.senderId == request.auth.uid &&
              data.text is string && data.text.size() >= 1 && data.text.size() <= 1000 &&
-             data.timestamp is timestamp;
+             data.timestamp is timestamp &&
+             (!('read' in data) || data.read is bool);
     }
 
     function isValidLike(data) {
@@ -130,7 +140,7 @@ service cloud.firestore {
     // ===============================================================
 
     match /_connection_test_/{docId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
     }
 
     match /users/{userId} {
@@ -169,12 +179,12 @@ service cloud.firestore {
       
       allow create: if isAuthenticated() && 
                       isValidMatch(request.resource.data) && 
-                      isRecent(request.resource.data.timestamp);
+                      isRecent(request.resource.data.createdAt);
                       
       allow update: if isAuthenticated() && 
                       request.auth.uid in resource.data.users && 
                       isValidMatch(request.resource.data) &&
-                      request.resource.data.timestamp == resource.data.timestamp;
+                      request.resource.data.createdAt == resource.data.createdAt;
                       
       allow delete: if isAdmin();
 
