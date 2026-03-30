@@ -1,0 +1,174 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: uid
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required, email format)
+    //   - displayName: string (required, 1-50 chars)
+    //   - age: number (required, 18-120)
+    //   - gender: string (required, male/female/other)
+    //   - interestedIn: string (required, male/female/both)
+    //   - bio: string (optional, < 500 chars)
+    //   - location: map (optional)
+    //   - photos: list (optional, < 10 items)
+    //   - interests: list (optional, < 20 items)
+    //   - role: string (required, user/admin)
+    //   - isVerified: bool (optional)
+    //   - isOnline: bool (optional)
+    //   - lastSeen: timestamp (optional)
+    //   - createdAt: timestamp (required)
+    //   - updatedAt: timestamp (required)
+    //
+    // Collection: likes
+    // Document ID: fromUid_toUid
+    // Fields:
+    //   - fromUid: string (required)
+    //   - toUid: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: matches
+    // Document ID: matchId (e.g., uid1_uid2)
+    // Fields:
+    //   - users: list (required, size 2)
+    //   - createdAt: timestamp (required)
+    //   - lastMessage: string (optional)
+    //   - lastMessageAt: timestamp (optional)
+    //
+    // Collection: matches/{matchId}/messages
+    // Document ID: messageId
+    // Fields:
+    //   - senderUid: string (required)
+    //   - text: string (required, 1-1000 chars)
+    //   - createdAt: timestamp (required)
+    //   - read: bool (optional)
+    //
+    // Collection: reports
+    // Document ID: reportId
+    // Fields:
+    //   - reporterUid: string (required)
+    //   - reportedUid: string (required)
+    //   - reason: string (required)
+    //   - details: string (optional)
+    //   - status: string (required, pending/resolved/dismissed)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "siphes9812@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'email', 'displayName', 'age', 'gender', 'interestedIn', 'role', 'createdAt', 'updatedAt']) &&
+             data.uid is string && data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 50 &&
+             data.age is number && data.age >= 18 && data.age <= 120 &&
+             data.gender in ['male', 'female', 'other'] &&
+             data.interestedIn in ['male', 'female', 'both'] &&
+             data.role in ['user', 'admin'] &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    function isValidLike(data) {
+      return hasRequiredFields(['fromUid', 'toUid', 'createdAt']) &&
+             data.fromUid == request.auth.uid &&
+             data.toUid is string &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidMatch(data) {
+      return hasRequiredFields(['users', 'createdAt']) &&
+             data.users is list && data.users.size() == 2 &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidMessage(data) {
+      return hasRequiredFields(['senderUid', 'text', 'createdAt']) &&
+             data.senderUid == request.auth.uid &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidReport(data) {
+      return hasRequiredFields(['reporterUid', 'reportedUid', 'reason', 'status', 'createdAt']) &&
+             data.reporterUid == request.auth.uid &&
+             data.reportedUid is string &&
+             data.reason is string &&
+             data.status == 'pending' &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(uid) && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
+      allow update: if (isOwner(uid) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /likes/{likeId} {
+      allow read: if isAuthenticated() && (request.auth.uid in likeId.split('_') || isAdmin());
+      allow create: if isAuthenticated() && isValidLike(request.resource.data) && likeId == request.resource.data.fromUid + '_' + request.resource.data.toUid;
+      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.fromUid || isAdmin());
+    }
+
+    match /matches/{matchId} {
+      allow read: if isAuthenticated() && (request.auth.uid in resource.data.users || isAdmin());
+      allow create: if isAuthenticated() && isValidMatch(request.resource.data) && request.auth.uid in request.resource.data.users;
+      allow update: if isAuthenticated() && (request.auth.uid in resource.data.users || isAdmin());
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && (request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users || isAdmin());
+        allow create: if isAuthenticated() && (request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users) && isValidMessage(request.resource.data);
+      }
+    }
+
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && isValidReport(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+  }
+}

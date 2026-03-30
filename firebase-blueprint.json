@@ -1,0 +1,93 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user profile information and settings.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier for the user." },
+        "email": { "type": "string", "format": "email", "description": "User's email address." },
+        "displayName": { "type": "string", "description": "User's full name." },
+        "age": { "type": "integer", "description": "User's age." },
+        "gender": { "type": "string", "enum": ["male", "female", "other"], "description": "User's gender." },
+        "interestedIn": { "type": "string", "enum": ["male", "female", "both"], "description": "Gender the user is interested in." },
+        "bio": { "type": "string", "description": "User's short biography." },
+        "location": {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" },
+            "city": { "type": "string" }
+          }
+        },
+        "photos": { "type": "array", "items": { "type": "string" }, "description": "List of profile photo URLs." },
+        "interests": { "type": "array", "items": { "type": "string" }, "description": "List of user interests/hobbies." },
+        "occupation": { "type": "string" },
+        "education": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User's role in the app." },
+        "isVerified": { "type": "boolean", "description": "Whether the profile is verified." },
+        "isOnline": { "type": "boolean" },
+        "lastSeen": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "age", "gender", "interestedIn"]
+    },
+    "Like": {
+      "title": "User Like",
+      "description": "Records a user liking another user.",
+      "type": "object",
+      "properties": {
+        "fromUid": { "type": "string" },
+        "toUid": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fromUid", "toUid", "createdAt"]
+    },
+    "Match": {
+      "title": "Match",
+      "description": "Represents a mutual like between two users.",
+      "type": "object",
+      "properties": {
+        "users": { "type": "array", "items": { "type": "string" }, "description": "The two UIDs involved in the match." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastMessage": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["users", "createdAt"]
+    },
+    "Message": {
+      "title": "Chat Message",
+      "description": "A single message in a chat.",
+      "type": "object",
+      "properties": {
+        "senderUid": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["senderUid", "text", "createdAt"]
+    },
+    "Report": {
+      "title": "User Report",
+      "description": "A report filed against a user for inappropriate behavior.",
+      "type": "object",
+      "properties": {
+        "reporterUid": { "type": "string" },
+        "reportedUid": { "type": "string" },
+        "reason": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "resolved", "dismissed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reporterUid", "reportedUid", "reason", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": { "schema": "User", "description": "User profiles." },
+    "/likes/{likeId}": { "schema": "Like", "description": "User likes. likeId can be fromUid_toUid." },
+    "/matches/{matchId}": { "schema": "Match", "description": "Mutual matches." },
+    "/matches/{matchId}/messages/{messageId}": { "schema": "Message", "description": "Messages within a match." },
+    "/reports/{reportId}": { "schema": "Report", "description": "User reports for moderation." }
+  }
+}
