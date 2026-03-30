@@ -48,7 +48,7 @@ export const Splash: React.FC = () => {
           className="mt-8 text-center"
         >
           <h1 className="text-5xl font-black tracking-tighter text-white uppercase italic">
-            LoveLink
+            Umzimkhulu Love Link
           </h1>
           <div className="mt-2 h-1 w-12 bg-brand-500 mx-auto rounded-full" />
           <p className="mt-4 text-brand-100/60 font-medium tracking-widest uppercase text-[10px]">

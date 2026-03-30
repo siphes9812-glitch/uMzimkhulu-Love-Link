@@ -163,7 +163,7 @@ export const Discover: React.FC = () => {
           <div className="p-1.5 bg-brand-500 rounded-lg">
             <Heart className="text-white" fill="white" size={18} />
           </div>
-          <h1 className="text-2xl font-black tracking-tighter text-brand-500 uppercase italic">LoveLink</h1>
+          <h1 className="text-2xl font-black tracking-tighter text-brand-500 uppercase italic">Umzimkhulu Love Link</h1>
         </div>
         <button className="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-400 hover:text-brand-500 transition-all">
           <Star size={24} />

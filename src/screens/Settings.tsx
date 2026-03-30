@@ -110,7 +110,7 @@ export const Settings: React.FC = () => {
         <div className="text-center py-12">
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-50 dark:bg-white/5 rounded-full mb-4">
             <Heart size={12} className="text-brand-500 fill-brand-500" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">LoveLink v1.0.0</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Umzimkhulu Love Link v1.0.0</span>
           </div>
           <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Made with passion for true connection</p>
         </div>

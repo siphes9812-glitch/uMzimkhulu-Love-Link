@@ -41,7 +41,7 @@ export const Welcome: React.FC = () => {
             <div className="p-2 bg-brand-500 rounded-xl">
               <Heart size={24} fill="white" className="text-white" />
             </div>
-            <span className="text-white font-black tracking-tighter text-2xl uppercase italic">LoveLink</span>
+            <span className="text-white font-black tracking-tighter text-2xl uppercase italic">Umzimkhulu Love Link</span>
           </motion.div>
 
           <motion.div

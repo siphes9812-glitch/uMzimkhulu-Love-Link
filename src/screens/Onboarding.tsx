@@ -92,7 +92,7 @@ export const Onboarding: React.FC = () => {
             <div className="mb-10">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full">Step 01</span>
               <h2 className="mt-4 text-5xl font-black tracking-tighter uppercase italic leading-none">What's your <span className="text-brand-500">name?</span></h2>
-              <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">This is how you'll appear on LoveLink.</p>
+              <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">This is how you'll appear on Umzimkhulu Love Link.</p>
             </div>
 
             <div className="space-y-10">

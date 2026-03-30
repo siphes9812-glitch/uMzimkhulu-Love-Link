@@ -25,7 +25,11 @@ export const Register: React.FC = () => {
       await createUserWithEmailAndPassword(auth, email, password);
       navigate("/onboarding");
     } catch (err: any) {
-      setError(err.message || "Failed to register");
+      if (err.code === "auth/operation-not-allowed") {
+        setError("Email/Password sign-in is not enabled in the Firebase Console. Please enable it in the Auth settings.");
+      } else {
+        setError(err.message || "Failed to register");
+      }
     } finally {
       setLoading(false);
     }
@@ -51,7 +55,7 @@ export const Register: React.FC = () => {
             <UserPlus size={40} color="white" fill="white" />
           </div>
         </motion.div>
-        <h1 className="mt-10 text-5xl font-black tracking-tighter uppercase italic text-brand-500 leading-none">Join LoveLink</h1>
+        <h1 className="mt-10 text-5xl font-black tracking-tighter uppercase italic text-brand-500 leading-none">Join Umzimkhulu Love Link</h1>
         <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">Start your journey to find true love</p>
       </div>
 

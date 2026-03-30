@@ -20,7 +20,11 @@ export const Login: React.FC = () => {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/");
     } catch (err: any) {
-      setError(err.message || "Failed to login");
+      if (err.code === "auth/operation-not-allowed") {
+        setError("Email/Password sign-in is not enabled in the Firebase Console. Please enable it in the Auth settings.");
+      } else {
+        setError(err.message || "Failed to login");
+      }
     } finally {
       setLoading(false);
     }

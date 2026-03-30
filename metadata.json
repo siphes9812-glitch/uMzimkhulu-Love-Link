@@ -1,5 +1,5 @@
 {
-  "name": "LoveLink",
+  "name": "Umzimkhulu Love Link",
   "description": "A modern, mobile-first dating app that is completely free to use. Connect, match, and chat with people nearby safely and easily.",
   "requestFramePermissions": ["geolocation", "camera"]
 }
