@@ -1,93 +1,77 @@
 {
   "entities": {
-    "User": {
+    "UserProfile": {
       "title": "User Profile",
-      "description": "Stores user profile information and settings.",
+      "description": "Stores user profile information, preferences, and status.",
       "type": "object",
       "properties": {
-        "uid": { "type": "string", "description": "Unique identifier for the user." },
-        "email": { "type": "string", "format": "email", "description": "User's email address." },
-        "displayName": { "type": "string", "description": "User's full name." },
-        "age": { "type": "integer", "description": "User's age." },
-        "gender": { "type": "string", "enum": ["male", "female", "other"], "description": "User's gender." },
-        "interestedIn": { "type": "string", "enum": ["male", "female", "both"], "description": "Gender the user is interested in." },
-        "bio": { "type": "string", "description": "User's short biography." },
-        "location": {
-          "type": "object",
-          "properties": {
-            "latitude": { "type": "number" },
-            "longitude": { "type": "number" },
-            "city": { "type": "string" }
-          }
-        },
-        "photos": { "type": "array", "items": { "type": "string" }, "description": "List of profile photo URLs." },
-        "interests": { "type": "array", "items": { "type": "string" }, "description": "List of user interests/hobbies." },
-        "occupation": { "type": "string" },
-        "education": { "type": "string" },
-        "role": { "type": "string", "enum": ["user", "admin"], "description": "User's role in the app." },
-        "isVerified": { "type": "boolean", "description": "Whether the profile is verified." },
-        "isOnline": { "type": "boolean" },
-        "lastSeen": { "type": "string", "format": "date-time" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "updatedAt": { "type": "string", "format": "date-time" }
+        "uid": { "type": "string", "description": "The unique identifier for the user." },
+        "displayName": { "type": "string", "description": "The user's display name." },
+        "email": { "type": "string", "format": "email", "description": "The user's email address." },
+        "photoURL": { "type": "string", "description": "The URL of the user's profile picture." },
+        "bio": { "type": "string", "description": "A short biography of the user." },
+        "age": { "type": "integer", "description": "The user's age." },
+        "gender": { "type": "string", "enum": ["male", "female", "other"], "description": "The user's gender." },
+        "interestedIn": { "type": "array", "items": { "type": "string" }, "description": "Genders the user is interested in." },
+        "location": { "type": "string", "description": "The user's location." },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "The user's role in the application." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the profile was created." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "When the profile was last updated." }
       },
-      "required": ["uid", "email", "displayName", "age", "gender", "interestedIn"]
-    },
-    "Like": {
-      "title": "User Like",
-      "description": "Records a user liking another user.",
-      "type": "object",
-      "properties": {
-        "fromUid": { "type": "string" },
-        "toUid": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["fromUid", "toUid", "createdAt"]
+      "required": ["uid", "displayName", "email", "createdAt"]
     },
     "Match": {
       "title": "Match",
-      "description": "Represents a mutual like between two users.",
+      "description": "Represents a match between two users.",
       "type": "object",
       "properties": {
-        "users": { "type": "array", "items": { "type": "string" }, "description": "The two UIDs involved in the match." },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "lastMessage": { "type": "string" },
-        "lastMessageAt": { "type": "string", "format": "date-time" }
+        "users": { "type": "array", "items": { "type": "string" }, "description": "The UIDs of the two matched users." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the match occurred." },
+        "lastMessage": { "type": "string", "description": "The content of the last message sent in this match." },
+        "lastMessageTimestamp": { "type": "string", "format": "date-time", "description": "When the last message was sent." }
       },
-      "required": ["users", "createdAt"]
+      "required": ["users", "timestamp"]
     },
-    "Message": {
+    "ChatMessage": {
       "title": "Chat Message",
-      "description": "A single message in a chat.",
+      "description": "A single message sent within a match's chat.",
       "type": "object",
       "properties": {
-        "senderUid": { "type": "string" },
-        "text": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "read": { "type": "boolean" }
+        "senderId": { "type": "string", "description": "The UID of the user who sent the message." },
+        "text": { "type": "string", "description": "The text content of the message." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the message was sent." }
       },
-      "required": ["senderUid", "text", "createdAt"]
+      "required": ["senderId", "text", "timestamp"]
     },
-    "Report": {
-      "title": "User Report",
-      "description": "A report filed against a user for inappropriate behavior.",
+    "Like": {
+      "title": "Like",
+      "description": "Represents a like or super like from one user to another.",
       "type": "object",
       "properties": {
-        "reporterUid": { "type": "string" },
-        "reportedUid": { "type": "string" },
-        "reason": { "type": "string" },
-        "details": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "resolved", "dismissed"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "fromUid": { "type": "string", "description": "The UID of the user who liked." },
+        "toUid": { "type": "string", "description": "The UID of the user who was liked." },
+        "isSuper": { "type": "boolean", "description": "Whether it was a super like." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the like occurred." }
       },
-      "required": ["reporterUid", "reportedUid", "reason", "status", "createdAt"]
+      "required": ["fromUid", "toUid", "isSuper", "createdAt"]
     }
   },
   "firestore": {
-    "/users/{uid}": { "schema": "User", "description": "User profiles." },
-    "/likes/{likeId}": { "schema": "Like", "description": "User likes. likeId can be fromUid_toUid." },
-    "/matches/{matchId}": { "schema": "Match", "description": "Mutual matches." },
-    "/matches/{matchId}/messages/{messageId}": { "schema": "Message", "description": "Messages within a match." },
-    "/reports/{reportId}": { "schema": "Report", "description": "User reports for moderation." }
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Collection of user profiles."
+    },
+    "/likes/{likeId}": {
+      "schema": "Like",
+      "description": "Collection of likes between users."
+    },
+    "/matches/{matchId}": {
+      "schema": "Match",
+      "description": "Collection of matches between users."
+    },
+    "/matches/{matchId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Subcollection of messages for a specific match."
+    }
   }
 }

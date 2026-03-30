@@ -44,55 +44,55 @@ export const Register: React.FC = () => {
         <ChevronLeft size={24} />
       </button>
 
-      <div className="flex flex-col items-center mb-16 text-center">
+      <div className="flex flex-col items-center mb-10 text-center">
         <motion.div 
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="relative"
         >
           <div className="absolute inset-0 bg-brand-500 rounded-full blur-2xl opacity-20 animate-pulse" />
-          <div className="relative p-5 bg-brand-500 rounded-[2rem] shadow-2xl shadow-brand-500/40">
-            <UserPlus size={40} color="white" fill="white" />
+          <div className="relative p-4 bg-brand-500 rounded-[1.5rem] shadow-2xl shadow-brand-500/40">
+            <UserPlus size={32} color="white" fill="white" />
           </div>
         </motion.div>
-        <h1 className="mt-10 text-5xl font-black tracking-tighter uppercase italic text-brand-500 leading-none">Join Umzimkhulu Love Link</h1>
-        <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">Start your journey to find true love</p>
+        <h1 className="mt-8 text-4xl font-black tracking-tighter uppercase italic text-brand-500 leading-none">Join Umzimkhulu Love Link</h1>
+        <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Start your journey to find true love</p>
       </div>
 
-      <form onSubmit={handleRegister} className="w-full max-w-sm mx-auto space-y-8">
-        <div className="space-y-4">
+      <form onSubmit={handleRegister} className="w-full max-w-sm mx-auto space-y-6">
+        <div className="space-y-3">
           <div className="relative group">
-            <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={20} />
+            <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={18} />
             <input
               type="email"
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-14 pr-6 py-5 bg-gray-50 dark:bg-white/5 border-none rounded-3xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all font-bold text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="w-full pl-14 pr-6 py-4 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all font-bold text-gray-900 dark:text-white placeholder:text-gray-400 text-sm"
               required
             />
           </div>
 
           <div className="relative group">
-            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={20} />
+            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={18} />
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-14 pr-6 py-5 bg-gray-50 dark:bg-white/5 border-none rounded-3xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all font-bold text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="w-full pl-14 pr-6 py-4 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all font-bold text-gray-900 dark:text-white placeholder:text-gray-400 text-sm"
               required
             />
           </div>
 
           <div className="relative group">
-            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={20} />
+            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={18} />
             <input
               type="password"
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full pl-14 pr-6 py-5 bg-gray-50 dark:bg-white/5 border-none rounded-3xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all font-bold text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="w-full pl-14 pr-6 py-4 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all font-bold text-gray-900 dark:text-white placeholder:text-gray-400 text-sm"
               required
             />
           </div>
@@ -102,7 +102,7 @@ export const Register: React.FC = () => {
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-xs font-bold text-center text-red-500 uppercase tracking-widest"
+            className="text-[10px] font-bold text-center text-red-500 uppercase tracking-widest"
           >
             {error}
           </motion.p>
@@ -111,13 +111,13 @@ export const Register: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-5 font-black uppercase tracking-widest text-sm text-white bg-brand-500 rounded-3xl shadow-2xl shadow-brand-500/30 hover:bg-brand-600 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center"
+          className="w-full py-4 font-black uppercase tracking-widest text-xs text-white bg-brand-500 rounded-2xl shadow-2xl shadow-brand-500/30 hover:bg-brand-600 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center"
         >
           {loading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <Sparkles size={18} className="mr-2" />
+              <Sparkles size={16} className="mr-2" />
               Sign Up
             </>
           )}

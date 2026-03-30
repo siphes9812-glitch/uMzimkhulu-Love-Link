@@ -55,29 +55,29 @@ export const Onboarding: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen p-8 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
-      <div className="flex items-center justify-between mb-12">
+    <div className="flex flex-col min-h-screen p-6 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
+      <div className="flex items-center justify-between mb-8">
         {step > 1 ? (
           <button 
             onClick={prevStep} 
-            className="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-500 hover:text-brand-500 transition-all active:scale-95"
+            className="p-2.5 bg-gray-50 dark:bg-white/5 rounded-xl text-gray-500 hover:text-brand-500 transition-all active:scale-95"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} />
           </button>
-        ) : <div className="w-[52px]" />}
+        ) : <div className="w-[44px]" />}
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5">
           {steps.map((s, i) => (
             <div key={i} className="flex items-center">
               <div
-                className={`h-2 w-8 rounded-full transition-all duration-500 ${
+                className={`h-1.5 w-6 rounded-full transition-all duration-500 ${
                   step > i ? "bg-brand-500" : "bg-gray-100 dark:bg-white/5"
-                } ${step === i + 1 ? "w-12 bg-brand-500" : ""}`}
+                } ${step === i + 1 ? "w-10 bg-brand-500" : ""}`}
               />
             </div>
           ))}
         </div>
-        <div className="w-[52px]" />
+        <div className="w-[44px]" />
       </div>
 
       <AnimatePresence mode="wait">
@@ -89,34 +89,34 @@ export const Onboarding: React.FC = () => {
             exit={{ x: -20, opacity: 0 }}
             className="flex-grow flex flex-col"
           >
-            <div className="mb-10">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full">Step 01</span>
-              <h2 className="mt-4 text-5xl font-black tracking-tighter uppercase italic leading-none">What's your <span className="text-brand-500">name?</span></h2>
-              <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">This is how you'll appear on Umzimkhulu Love Link.</p>
+            <div className="mb-8">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-2.5 py-0.5 rounded-full">Step 01</span>
+              <h2 className="mt-3 text-4xl font-black tracking-tighter uppercase italic leading-none">What's your <span className="text-brand-500">name?</span></h2>
+              <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">This is how you'll appear on Umzimkhulu Love Link.</p>
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-8">
               <div className="group">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 group-focus-within:text-brand-500 transition-colors">First Name</label>
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 group-focus-within:text-brand-500 transition-colors">First Name</label>
                 <input
                   type="text"
                   placeholder="Enter your name"
                   value={formData.displayName}
                   onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                  className="w-full px-0 py-4 text-3xl font-black bg-transparent border-b-4 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all placeholder:text-gray-200 dark:placeholder:text-white/5"
+                  className="w-full px-0 py-3 text-2xl font-black bg-transparent border-b-2 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all placeholder:text-gray-200 dark:placeholder:text-white/5"
                 />
               </div>
               <div className="group">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 group-focus-within:text-brand-500 transition-colors">Your Age</label>
-                <div className="flex items-center space-x-4">
-                  <Calendar className="text-brand-500" size={24} />
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 group-focus-within:text-brand-500 transition-colors">Your Age</label>
+                <div className="flex items-center space-x-3">
+                  <Calendar className="text-brand-500" size={20} />
                   <input
                     type="number"
                     min="18"
                     max="100"
                     value={formData.age}
                     onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) })}
-                    className="w-full px-0 py-4 text-3xl font-black bg-transparent border-b-4 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all"
+                    className="w-full px-0 py-3 text-2xl font-black bg-transparent border-b-2 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all"
                   />
                 </div>
               </div>
@@ -132,21 +132,21 @@ export const Onboarding: React.FC = () => {
             exit={{ x: -20, opacity: 0 }}
             className="flex-grow flex flex-col"
           >
-            <div className="mb-10">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full">Step 02</span>
-              <h2 className="mt-4 text-5xl font-black tracking-tighter uppercase italic leading-none">Tell us <span className="text-brand-500">more</span></h2>
-              <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">Help us find the right people for you.</p>
+            <div className="mb-8">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-2.5 py-0.5 rounded-full">Step 02</span>
+              <h2 className="mt-3 text-4xl font-black tracking-tighter uppercase italic leading-none">Tell us <span className="text-brand-500">more</span></h2>
+              <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Help us find the right people for you.</p>
             </div>
 
-            <div className="space-y-12">
+            <div className="space-y-10">
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">I am a</label>
-                <div className="grid grid-cols-3 gap-4">
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">I am a</label>
+                <div className="grid grid-cols-3 gap-3">
                   {["male", "female", "other"].map((g) => (
                     <button
                       key={g}
                       onClick={() => setFormData({ ...formData, gender: g })}
-                      className={`py-5 rounded-[2rem] border-4 font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 ${
+                      className={`py-4 rounded-2xl border-2 font-black uppercase tracking-widest text-[9px] transition-all active:scale-95 ${
                         formData.gender === g
                           ? "border-brand-500 bg-brand-500 text-white shadow-xl shadow-brand-500/30"
                           : "border-gray-100 dark:border-white/5 text-gray-400"
@@ -159,13 +159,13 @@ export const Onboarding: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Interested in</label>
-                <div className="grid grid-cols-3 gap-4">
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Interested in</label>
+                <div className="grid grid-cols-3 gap-3">
                   {["male", "female", "both"].map((i) => (
                     <button
                       key={i}
                       onClick={() => setFormData({ ...formData, interestedIn: i })}
-                      className={`py-5 rounded-[2rem] border-4 font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 ${
+                      className={`py-4 rounded-2xl border-2 font-black uppercase tracking-widest text-[9px] transition-all active:scale-95 ${
                         formData.interestedIn === i
                           ? "border-brand-500 bg-brand-500 text-white shadow-xl shadow-brand-500/30"
                           : "border-gray-100 dark:border-white/5 text-gray-400"
@@ -188,29 +188,29 @@ export const Onboarding: React.FC = () => {
             exit={{ x: -20, opacity: 0 }}
             className="flex-grow flex flex-col"
           >
-            <div className="mb-10">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full">Step 03</span>
-              <h2 className="mt-4 text-5xl font-black tracking-tighter uppercase italic leading-none">Your <span className="text-brand-500">Vibe</span></h2>
-              <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">Show off your personality!</p>
+            <div className="mb-8">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-2.5 py-0.5 rounded-full">Step 03</span>
+              <h2 className="mt-3 text-4xl font-black tracking-tighter uppercase italic leading-none">Your <span className="text-brand-500">Vibe</span></h2>
+              <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Show off your personality!</p>
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-8">
               <div className="flex justify-center">
-                <div className="relative w-48 h-64 bg-gray-100 dark:bg-white/5 rounded-[3rem] overflow-hidden border-4 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-brand-500/50">
+                <div className="relative w-40 h-56 bg-gray-100 dark:bg-white/5 rounded-[2rem] overflow-hidden border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-brand-500/50">
                   <img src={formData.photos[0]} alt="Profile" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
-                  <div className="relative z-10 p-4 bg-white dark:bg-[#0a0a0a] rounded-2xl shadow-xl group-hover:scale-110 transition-transform">
-                    <Camera size={24} className="text-brand-500" />
+                  <div className="relative z-10 p-3 bg-white dark:bg-[#0a0a0a] rounded-xl shadow-xl group-hover:scale-110 transition-transform">
+                    <Camera size={20} className="text-brand-500" />
                   </div>
-                  <span className="mt-4 text-[10px] font-black uppercase tracking-widest relative z-10 text-gray-500">Change Photo</span>
+                  <span className="mt-3 text-[9px] font-black uppercase tracking-widest relative z-10 text-gray-500">Change Photo</span>
                 </div>
               </div>
               <div className="group">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 group-focus-within:text-brand-500 transition-colors">About Me</label>
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 group-focus-within:text-brand-500 transition-colors">About Me</label>
                 <textarea
                   placeholder="Write a little about yourself..."
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  className="w-full px-6 py-5 bg-gray-50 dark:bg-white/5 border-none rounded-[2rem] focus:outline-none focus:ring-4 focus:ring-brand-500/20 transition-all min-h-[140px] font-bold text-gray-900 dark:text-white placeholder:text-gray-400"
+                  className="w-full px-5 py-4 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:outline-none focus:ring-4 focus:ring-brand-500/20 transition-all min-h-[120px] font-bold text-gray-900 dark:text-white placeholder:text-gray-400 text-sm"
                 />
               </div>
             </div>
@@ -225,10 +225,10 @@ export const Onboarding: React.FC = () => {
             exit={{ x: -20, opacity: 0 }}
             className="flex-grow flex flex-col"
           >
-            <div className="mb-10">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full">Step 04</span>
-              <h2 className="mt-4 text-5xl font-black tracking-tighter uppercase italic leading-none">Almost <span className="text-brand-500">there!</span></h2>
-              <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px]">Where are you located?</p>
+            <div className="mb-8">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-2.5 py-0.5 rounded-full">Step 04</span>
+              <h2 className="mt-3 text-4xl font-black tracking-tighter uppercase italic leading-none">Almost <span className="text-brand-500">there!</span></h2>
+              <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Where are you located?</p>
             </div>
 
             <div className="flex-grow flex flex-col items-center justify-center text-center">
@@ -238,34 +238,34 @@ export const Onboarding: React.FC = () => {
                   rotate: [0, 5, -5, 0]
                 }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="relative mb-10"
+                className="relative mb-8"
               >
                 <div className="absolute inset-0 bg-brand-500 rounded-full blur-3xl opacity-20" />
-                <div className="relative p-10 bg-brand-500 rounded-[3rem] text-white shadow-2xl shadow-brand-500/40">
-                  <MapPin size={64} />
+                <div className="relative p-8 bg-brand-500 rounded-[2.5rem] text-white shadow-2xl shadow-brand-500/40">
+                  <MapPin size={48} />
                 </div>
               </motion.div>
-              <h3 className="text-4xl font-black tracking-tighter uppercase italic text-brand-500">{formData.location.city}</h3>
-              <p className="mt-4 text-gray-500 font-bold uppercase tracking-widest text-[10px] max-w-[200px]">We'll use your location to find matches nearby.</p>
-              <button className="mt-8 text-brand-500 font-black uppercase tracking-widest text-[10px] hover:underline decoration-4 underline-offset-8">Change Location</button>
+              <h3 className="text-3xl font-black tracking-tighter uppercase italic text-brand-500">{formData.location.city}</h3>
+              <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px] max-w-[180px]">We'll use your location to find matches nearby.</p>
+              <button className="mt-6 text-brand-500 font-black uppercase tracking-widest text-[9px] hover:underline decoration-2 underline-offset-4">Change Location</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="mt-12">
+      <div className="mt-8">
         <button
           onClick={step === 4 ? handleFinish : nextStep}
           disabled={loading || (step === 1 && !formData.displayName)}
-          className="w-full py-6 flex items-center justify-center font-black uppercase tracking-[0.2em] text-sm text-white bg-brand-500 rounded-[2rem] shadow-2xl shadow-brand-500/30 hover:bg-brand-600 transition-all active:scale-[0.98] disabled:opacity-50"
+          className="w-full py-4.5 flex items-center justify-center font-black uppercase tracking-[0.2em] text-xs text-white bg-brand-500 rounded-2xl shadow-2xl shadow-brand-500/30 hover:bg-brand-600 transition-all active:scale-[0.98] disabled:opacity-50"
         >
           {loading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
               {step === 4 ? "Start Matching" : "Continue"}
-              {step < 4 && <ChevronRight size={20} className="ml-2" />}
-              {step === 4 && <Sparkles size={20} className="ml-2" />}
+              {step < 4 && <ChevronRight size={18} className="ml-2" />}
+              {step === 4 && <Sparkles size={18} className="ml-2" />}
             </>
           )}
         </button>

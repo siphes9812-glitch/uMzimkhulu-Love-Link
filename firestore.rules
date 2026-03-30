@@ -1,62 +1,41 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     // ===============================================================
     // Assumed Data Model
     // ===============================================================
     //
     // Collection: users
-    // Document ID: uid
+    // Document ID: {userId} (UID from Firebase Auth)
     // Fields:
-    //   - uid: string (required)
-    //   - email: string (required, email format)
-    //   - displayName: string (required, 1-50 chars)
-    //   - age: number (required, 18-120)
-    //   - gender: string (required, male/female/other)
-    //   - interestedIn: string (required, male/female/both)
-    //   - bio: string (optional, < 500 chars)
-    //   - location: map (optional)
-    //   - photos: list (optional, < 10 items)
-    //   - interests: list (optional, < 20 items)
-    //   - role: string (required, user/admin)
-    //   - isVerified: bool (optional)
-    //   - isOnline: bool (optional)
-    //   - lastSeen: timestamp (optional)
-    //   - createdAt: timestamp (required)
-    //   - updatedAt: timestamp (required)
-    //
-    // Collection: likes
-    // Document ID: fromUid_toUid
-    // Fields:
-    //   - fromUid: string (required)
-    //   - toUid: string (required)
-    //   - createdAt: timestamp (required)
+    //   - uid: string (required, immutable) - The unique identifier for the user.
+    //   - displayName: string (required, min: 1, max: 50) - The user's display name.
+    //   - email: string (required, format: email) - The user's email address.
+    //   - photoURL: string (optional, format: url) - The URL of the user's profile picture.
+    //   - bio: string (optional, max: 500) - A short biography of the user.
+    //   - age: number (optional, min: 18, max: 120) - The user's age.
+    //   - gender: string (optional, enum: ['male', 'female', 'other']) - The user's gender.
+    //   - interestedIn: list (optional, max: 3) - Genders the user is interested in.
+    //   - location: string (optional, max: 100) - The user's location.
+    //   - role: string (required, enum: ['user', 'admin']) - The user's role.
+    //   - createdAt: timestamp (required, immutable) - When the profile was created.
+    //   - updatedAt: timestamp (required) - When the profile was last updated.
     //
     // Collection: matches
-    // Document ID: matchId (e.g., uid1_uid2)
+    // Document ID: {matchId}
     // Fields:
-    //   - users: list (required, size 2)
-    //   - createdAt: timestamp (required)
-    //   - lastMessage: string (optional)
-    //   - lastMessageAt: timestamp (optional)
+    //   - users: list (required, size: 2) - The UIDs of the two matched users.
+    //   - timestamp: timestamp (required, immutable) - When the match occurred.
+    //   - lastMessage: string (optional, max: 1000) - The content of the last message.
+    //   - lastMessageTimestamp: timestamp (optional) - When the last message was sent.
     //
     // Collection: matches/{matchId}/messages
-    // Document ID: messageId
+    // Document ID: {messageId}
     // Fields:
-    //   - senderUid: string (required)
-    //   - text: string (required, 1-1000 chars)
-    //   - createdAt: timestamp (required)
-    //   - read: bool (optional)
-    //
-    // Collection: reports
-    // Document ID: reportId
-    // Fields:
-    //   - reporterUid: string (required)
-    //   - reportedUid: string (required)
-    //   - reason: string (required)
-    //   - details: string (optional)
-    //   - status: string (required, pending/resolved/dismissed)
-    //   - createdAt: timestamp (required)
+    //   - senderId: string (required, immutable) - The UID of the sender.
+    //   - text: string (required, min: 1, max: 1000) - The message text.
+    //   - timestamp: timestamp (required, immutable) - When the message was sent.
     //
     // ===============================================================
 
@@ -90,49 +69,59 @@ service cloud.firestore {
       return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
+    function isValidUrl(url) {
+      return url is string && (url.matches("^https://.*") || url.matches("^http://.*"));
+    }
+
+    function isRecent(ts) {
+      return ts is timestamp && ts > request.time - duration.value(5, 'm') && ts < request.time + duration.value(5, 'm');
+    }
+
     // ===============================================================
     // Domain Validators
     // ===============================================================
 
     function isValidUser(data) {
-      return hasRequiredFields(['uid', 'email', 'displayName', 'age', 'gender', 'interestedIn', 'role', 'createdAt', 'updatedAt']) &&
-             data.uid is string && data.uid == request.auth.uid &&
+      return hasRequiredFields(['uid', 'displayName', 'email', 'role', 'createdAt', 'updatedAt']) &&
+             hasOnlyAllowedFields(['uid', 'displayName', 'email', 'photoURL', 'bio', 'age', 'gender', 'interestedIn', 'location', 'role', 'createdAt', 'updatedAt']) &&
+             data.uid == request.auth.uid &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 50 &&
              isValidEmail(data.email) &&
-             data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 50 &&
-             data.age is number && data.age >= 18 && data.age <= 120 &&
-             data.gender in ['male', 'female', 'other'] &&
-             data.interestedIn in ['male', 'female', 'both'] &&
+             (!('photoURL' in data) || isValidUrl(data.photoURL)) &&
+             (!('bio' in data) || (data.bio is string && data.bio.size() <= 500)) &&
+             (!('age' in data) || (data.age is number && data.age >= 18 && data.age <= 120)) &&
+             (!('gender' in data) || data.gender in ['male', 'female', 'other']) &&
+             (!('interestedIn' in data) || (data.interestedIn is list && data.interestedIn.size() <= 3)) &&
+             (!('location' in data) || (data.location is string && data.location.size() <= 100)) &&
              data.role in ['user', 'admin'] &&
              data.createdAt is timestamp &&
              data.updatedAt is timestamp;
     }
 
-    function isValidLike(data) {
-      return hasRequiredFields(['fromUid', 'toUid', 'createdAt']) &&
-             data.fromUid == request.auth.uid &&
-             data.toUid is string &&
-             data.createdAt is timestamp;
-    }
-
     function isValidMatch(data) {
-      return hasRequiredFields(['users', 'createdAt']) &&
+      return hasRequiredFields(['users', 'timestamp']) &&
+             hasOnlyAllowedFields(['users', 'timestamp', 'lastMessage', 'lastMessageTimestamp']) &&
              data.users is list && data.users.size() == 2 &&
-             data.createdAt is timestamp;
+             request.auth.uid in data.users &&
+             data.timestamp is timestamp &&
+             (!('lastMessage' in data) || (data.lastMessage is string && data.lastMessage.size() <= 1000)) &&
+             (!('lastMessageTimestamp' in data) || data.lastMessageTimestamp is timestamp);
     }
 
     function isValidMessage(data) {
-      return hasRequiredFields(['senderUid', 'text', 'createdAt']) &&
-             data.senderUid == request.auth.uid &&
-             data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
-             data.createdAt is timestamp;
+      return hasRequiredFields(['senderId', 'text', 'timestamp']) &&
+             hasOnlyAllowedFields(['senderId', 'text', 'timestamp']) &&
+             data.senderId == request.auth.uid &&
+             data.text is string && data.text.size() >= 1 && data.text.size() <= 1000 &&
+             data.timestamp is timestamp;
     }
 
-    function isValidReport(data) {
-      return hasRequiredFields(['reporterUid', 'reportedUid', 'reason', 'status', 'createdAt']) &&
-             data.reporterUid == request.auth.uid &&
-             data.reportedUid is string &&
-             data.reason is string &&
-             data.status == 'pending' &&
+    function isValidLike(data) {
+      return hasRequiredFields(['fromUid', 'toUid', 'isSuper', 'createdAt']) &&
+             hasOnlyAllowedFields(['fromUid', 'toUid', 'isSuper', 'createdAt']) &&
+             data.fromUid == request.auth.uid &&
+             data.toUid is string && data.toUid.size() >= 1 &&
+             data.isSuper is bool &&
              data.createdAt is timestamp;
     }
 
@@ -140,35 +129,71 @@ service cloud.firestore {
     // Rules
     // ===============================================================
 
-    match /users/{uid} {
+    match /_connection_test_/{docId} {
       allow read: if isAuthenticated();
-      allow create: if isOwner(uid) && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
-      allow update: if (isOwner(uid) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role) || isAdmin();
+    }
+
+    match /users/{userId} {
+      // Users can read their own profile. Admins can read all profiles.
+      // For public profiles, we'd need a separate collection or denormalization.
+      // Here we allow authenticated users to read other profiles for discovery.
+      allow read: if isAuthenticated();
+      
+      allow create: if isOwner(userId) && 
+                      isValidUser(request.resource.data) && 
+                      request.resource.data.role == 'user' && // Cannot self-assign admin
+                      isRecent(request.resource.data.createdAt);
+                      
+      allow update: if (isOwner(userId) && 
+                       isValidUser(request.resource.data) && 
+                       request.resource.data.role == resource.data.role && // Cannot change own role
+                       request.resource.data.createdAt == resource.data.createdAt) || 
+                      isAdmin();
+                      
       allow delete: if isAdmin();
     }
 
     match /likes/{likeId} {
-      allow read: if isAuthenticated() && (request.auth.uid in likeId.split('_') || isAdmin());
-      allow create: if isAuthenticated() && isValidLike(request.resource.data) && likeId == request.resource.data.fromUid + '_' + request.resource.data.toUid;
-      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.fromUid || isAdmin());
+      allow read: if isAuthenticated() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      
+      allow create: if isAuthenticated() && 
+                      isValidLike(request.resource.data) && 
+                      isRecent(request.resource.data.createdAt);
+                      
+      allow update: if false; // Likes are immutable
+      allow delete: if isAuthenticated() && resource.data.fromUid == request.auth.uid;
     }
 
     match /matches/{matchId} {
-      allow read: if isAuthenticated() && (request.auth.uid in resource.data.users || isAdmin());
-      allow create: if isAuthenticated() && isValidMatch(request.resource.data) && request.auth.uid in request.resource.data.users;
-      allow update: if isAuthenticated() && (request.auth.uid in resource.data.users || isAdmin());
+      allow read: if isAuthenticated() && request.auth.uid in resource.data.users;
+      
+      allow create: if isAuthenticated() && 
+                      isValidMatch(request.resource.data) && 
+                      isRecent(request.resource.data.timestamp);
+                      
+      allow update: if isAuthenticated() && 
+                      request.auth.uid in resource.data.users && 
+                      isValidMatch(request.resource.data) &&
+                      request.resource.data.timestamp == resource.data.timestamp;
+                      
       allow delete: if isAdmin();
 
       match /messages/{messageId} {
-        allow read: if isAuthenticated() && (request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users || isAdmin());
-        allow create: if isAuthenticated() && (request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users) && isValidMessage(request.resource.data);
+        allow read: if isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users;
+        
+        allow create: if isAuthenticated() && 
+                        request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users && 
+                        isValidMessage(request.resource.data) && 
+                        isRecent(request.resource.data.timestamp);
+                        
+        allow update: if false; // Messages are immutable
+        allow delete: if isAdmin();
       }
     }
 
-    match /reports/{reportId} {
-      allow read: if isAdmin();
-      allow create: if isAuthenticated() && isValidReport(request.resource.data);
-      allow update, delete: if isAdmin();
+    // Default deny
+    match /{path=**} {
+      allow read, write: if false;
     }
   }
 }
