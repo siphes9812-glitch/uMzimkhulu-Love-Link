@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useAuth } from "../AuthContext";
 import { db } from "../firebase";
-import { Camera, MapPin, ChevronRight, ChevronLeft, Heart, Sparkles, User, Calendar, Target } from "lucide-react";
+import { Camera, MapPin, ChevronRight, ChevronLeft, Heart, Sparkles, User, Calendar, Target, Plus, X } from "lucide-react";
 
 export const Onboarding: React.FC = () => {
   const { user } = useAuth();
@@ -18,10 +18,53 @@ export const Onboarding: React.FC = () => {
     gender: "male",
     interestedIn: "female",
     bio: "",
-    photos: ["https://picsum.photos/seed/user/400/600"],
-    interests: [],
+    occupation: "",
+    education: "",
+    photos: [`https://picsum.photos/seed/${Math.random()}/400/600`],
+    interests: [] as string[],
     location: { city: "New York", latitude: 40.7128, longitude: -74.0060 },
   });
+
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
+
+  const generateAIBio = async () => {
+    setIsGeneratingBio(true);
+    try {
+      const { GoogleGenAI } = await import("@google/genai");
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Generate a short, catchy, and engaging dating profile bio for a ${formData.age} year old ${formData.gender} who is a ${formData.occupation || 'person'} and studied ${formData.education || 'various things'}. Keep it under 150 characters.`,
+      });
+      if (response.text) {
+        setFormData(prev => ({ ...prev, bio: response.text.trim() }));
+      }
+    } catch (error) {
+      console.error("Error generating bio:", error);
+    } finally {
+      setIsGeneratingBio(false);
+    }
+  };
+
+  const randomizePhoto = () => {
+    setFormData(prev => ({
+      ...prev,
+      photos: [`https://picsum.photos/seed/${Math.random()}/400/600`]
+    }));
+  };
+
+  const [newInterest, setNewInterest] = useState("");
+
+  const addInterest = () => {
+    if (newInterest.trim() && !formData.interests.includes(newInterest.trim())) {
+      setFormData({ ...formData, interests: [...formData.interests, newInterest.trim()] });
+      setNewInterest("");
+    }
+  };
+
+  const removeInterest = (interest: string) => {
+    setFormData({ ...formData, interests: formData.interests.filter((i) => i !== interest) });
+  };
 
   const nextStep = () => setStep((s) => s + 1);
   const prevStep = () => setStep((s) => s - 1);
@@ -51,6 +94,7 @@ export const Onboarding: React.FC = () => {
     { title: "Basics", icon: <User size={16} /> },
     { title: "Identity", icon: <Target size={16} /> },
     { title: "Profile", icon: <Camera size={16} /> },
+    { title: "Interests", icon: <Sparkles size={16} /> },
     { title: "Location", icon: <MapPin size={16} /> },
   ];
 
@@ -139,7 +183,7 @@ export const Onboarding: React.FC = () => {
               <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Help us find the right people for you.</p>
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-6 overflow-y-auto pr-2 max-h-[60vh]">
               <div>
                 <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">I am a</label>
                 <div className="grid grid-cols-3 gap-3">
@@ -177,6 +221,28 @@ export const Onboarding: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              <div className="group">
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-brand-500 transition-colors">Occupation</label>
+                <input
+                  type="text"
+                  placeholder="What do you do?"
+                  value={formData.occupation}
+                  onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
+                  className="w-full px-0 py-2 text-xl font-black bg-transparent border-b-2 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all placeholder:text-gray-200 dark:placeholder:text-white/5"
+                />
+              </div>
+
+              <div className="group">
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-brand-500 transition-colors">Education</label>
+                <input
+                  type="text"
+                  placeholder="Where did you study?"
+                  value={formData.education}
+                  onChange={(e) => setFormData({ ...formData, education: e.target.value })}
+                  className="w-full px-0 py-2 text-xl font-black bg-transparent border-b-2 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all placeholder:text-gray-200 dark:placeholder:text-white/5"
+                />
+              </div>
             </div>
           </motion.div>
         )}
@@ -197,16 +263,33 @@ export const Onboarding: React.FC = () => {
 
             <div className="space-y-8 max-w-sm">
               <div className="flex justify-center">
-                <div className="relative w-40 h-56 bg-gray-100 dark:bg-white/5 rounded-[2rem] overflow-hidden border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-brand-500/50">
+                <button 
+                  onClick={randomizePhoto}
+                  className="relative w-40 h-56 bg-gray-100 dark:bg-white/5 rounded-[2rem] overflow-hidden border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center group cursor-pointer transition-all hover:border-brand-500/50"
+                >
                   <img src={formData.photos[0]} alt="Profile" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
                   <div className="relative z-10 p-3 bg-white dark:bg-[#0a0a0a] rounded-xl shadow-xl group-hover:scale-110 transition-transform">
                     <Camera size={20} className="text-brand-500" />
                   </div>
                   <span className="mt-3 text-[9px] font-black uppercase tracking-widest relative z-10 text-gray-500">Change Photo</span>
-                </div>
+                </button>
               </div>
               <div className="group">
-                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 group-focus-within:text-brand-500 transition-colors">About Me</label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest group-focus-within:text-brand-500 transition-colors">About Me</label>
+                  <button 
+                    onClick={generateAIBio}
+                    disabled={isGeneratingBio}
+                    className="flex items-center space-x-1.5 text-[9px] font-black text-brand-500 uppercase tracking-widest hover:text-brand-600 transition-colors disabled:opacity-50"
+                  >
+                    {isGeneratingBio ? (
+                      <div className="w-3 h-3 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Sparkles size={12} />
+                    )}
+                    <span>AI Assist</span>
+                  </button>
+                </div>
                 <textarea
                   placeholder="Write a little about yourself..."
                   value={formData.bio}
@@ -228,6 +311,65 @@ export const Onboarding: React.FC = () => {
           >
             <div className="mb-8">
               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-2.5 py-0.5 rounded-full">Step 04</span>
+              <h2 className="mt-3 text-4xl font-black tracking-tighter uppercase italic leading-none">Your <span className="text-brand-500">Interests</span></h2>
+              <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">What makes you, you?</p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex flex-wrap gap-2">
+                {formData.interests.map((interest) => (
+                  <span key={interest} className="px-4 py-2 bg-brand-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full flex items-center">
+                    {interest}
+                    <button onClick={() => removeInterest(interest)} className="ml-2 hover:text-white/80">
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  placeholder="Add an interest (e.g. Hiking)"
+                  value={newInterest}
+                  onChange={(e) => setNewInterest(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addInterest()}
+                  className="flex-grow px-0 py-3 text-xl font-black bg-transparent border-b-2 border-gray-100 dark:border-white/5 focus:outline-none focus:border-brand-500 transition-all placeholder:text-gray-200 dark:placeholder:text-white/5"
+                />
+                <button 
+                  onClick={addInterest}
+                  className="p-3 bg-gray-900 dark:bg-white/10 text-white rounded-xl active:scale-95 transition-all"
+                >
+                  <Plus size={20} />
+                </button>
+              </div>
+              <div className="pt-4">
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Popular</p>
+                <div className="flex flex-wrap gap-2">
+                  {["Music", "Travel", "Food", "Art", "Sports", "Gaming", "Movies", "Reading"].map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => !formData.interests.includes(tag) && setFormData({ ...formData, interests: [...formData.interests, tag] })}
+                      className="px-4 py-2 bg-gray-50 dark:bg-white/5 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-brand-500 hover:text-white transition-all"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 5 && (
+          <motion.div
+            key="step5"
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -20, opacity: 0 }}
+            className="flex-grow flex flex-col"
+          >
+            <div className="mb-8">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-500 bg-brand-500/10 px-2.5 py-0.5 rounded-full">Step 05</span>
               <h2 className="mt-3 text-4xl font-black tracking-tighter uppercase italic leading-none">Almost <span className="text-brand-500">there!</span></h2>
               <p className="mt-3 text-gray-500 font-bold uppercase tracking-widest text-[9px]">Where are you located?</p>
             </div>
@@ -256,7 +398,7 @@ export const Onboarding: React.FC = () => {
 
       <div className="mt-8">
         <button
-          onClick={step === 4 ? handleFinish : nextStep}
+          onClick={step === 5 ? handleFinish : nextStep}
           disabled={loading || (step === 1 && !formData.displayName)}
           className="w-full py-4.5 flex items-center justify-center font-black uppercase tracking-[0.2em] text-xs text-white bg-brand-500 rounded-2xl shadow-2xl shadow-brand-500/30 hover:bg-brand-600 transition-all active:scale-[0.98] disabled:opacity-50"
         >
@@ -264,9 +406,9 @@ export const Onboarding: React.FC = () => {
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              {step === 4 ? "Start Matching" : "Continue"}
-              {step < 4 && <ChevronRight size={18} className="ml-2" />}
-              {step === 4 && <Sparkles size={18} className="ml-2" />}
+              {step === 5 ? "Start Matching" : "Continue"}
+              {step < 5 && <ChevronRight size={18} className="ml-2" />}
+              {step === 5 && <Sparkles size={18} className="ml-2" />}
             </>
           )}
         </button>

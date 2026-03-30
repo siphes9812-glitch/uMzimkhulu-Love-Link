@@ -19,9 +19,36 @@ export const EditProfile: React.FC = () => {
     occupation: profile?.occupation || "",
     education: profile?.education || "",
     interests: profile?.interests || [],
+    photos: profile?.photos || [],
   });
 
   const [newInterest, setNewInterest] = useState("");
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
+
+  const generateAIBio = async () => {
+    setIsGeneratingBio(true);
+    try {
+      const { GoogleGenAI } = await import("@google/genai");
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Generate a short, catchy, and engaging dating profile bio for a ${formData.age} year old ${formData.gender} who is a ${formData.occupation || 'person'} and studied ${formData.education || 'various things'}. Keep it under 150 characters.`,
+      });
+      if (response.text) {
+        setFormData(prev => ({ ...prev, bio: response.text.trim() }));
+      }
+    } catch (error) {
+      console.error("Error generating bio:", error);
+    } finally {
+      setIsGeneratingBio(false);
+    }
+  };
+
+  const randomizePhoto = (index: number) => {
+    const newPhotos = [...(formData.photos || [])];
+    newPhotos[index] = `https://picsum.photos/seed/${Math.random()}/400/600`;
+    setFormData(prev => ({ ...prev, photos: newPhotos }));
+  };
 
   const handleSave = async () => {
     if (!profile) return;
@@ -85,22 +112,31 @@ export const EditProfile: React.FC = () => {
             <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">Profile Photos</h3>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="relative aspect-[3/4] bg-gray-50 dark:bg-white/5 rounded-[2rem] overflow-hidden border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center group cursor-pointer hover:border-brand-500 transition-all">
-              <img 
-                src={profile?.photos?.[0] || `https://picsum.photos/seed/${profile?.uid}/400/600`} 
-                alt="Profile" 
-                className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" 
-              />
-              <div className="relative z-10 flex flex-col items-center text-gray-400 group-hover:text-brand-500 transition-colors">
-                <Camera size={28} />
-                <span className="mt-2 text-[10px] font-black uppercase tracking-widest">Change</span>
-              </div>
-            </div>
-            {[1, 2].map((i) => (
-              <div key={i} className="aspect-[3/4] bg-gray-50 dark:bg-white/5 rounded-[2rem] border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center text-gray-300 hover:border-brand-500 hover:text-brand-500 transition-all cursor-pointer">
-                <Plus size={28} />
-              </div>
+            {formData.photos.map((photo, idx) => (
+              <button 
+                key={idx}
+                onClick={() => randomizePhoto(idx)}
+                className="relative aspect-[3/4] bg-gray-50 dark:bg-white/5 rounded-[2rem] overflow-hidden border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center group cursor-pointer hover:border-brand-500 transition-all"
+              >
+                <img 
+                  src={photo} 
+                  alt={`Profile ${idx}`} 
+                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" 
+                />
+                <div className="relative z-10 flex flex-col items-center text-gray-400 group-hover:text-brand-500 transition-colors">
+                  <Camera size={28} />
+                  <span className="mt-2 text-[10px] font-black uppercase tracking-widest">Change</span>
+                </div>
+              </button>
             ))}
+            {formData.photos.length < 6 && (
+              <button 
+                onClick={() => setFormData(prev => ({ ...prev, photos: [...prev.photos, `https://picsum.photos/seed/${Math.random()}/400/600`] }))}
+                className="aspect-[3/4] bg-gray-50 dark:bg-white/5 rounded-[2rem] border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center text-gray-300 hover:border-brand-500 hover:text-brand-500 transition-all cursor-pointer"
+              >
+                <Plus size={28} />
+              </button>
+            )}
           </div>
         </section>
 
@@ -142,7 +178,21 @@ export const EditProfile: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Bio</label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Bio</label>
+              <button 
+                onClick={generateAIBio}
+                disabled={isGeneratingBio}
+                className="flex items-center space-x-1.5 text-[10px] font-black text-brand-500 uppercase tracking-widest hover:text-brand-600 transition-colors disabled:opacity-50"
+              >
+                {isGeneratingBio ? (
+                  <div className="w-3 h-3 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Sparkles size={12} />
+                )}
+                <span>AI Assist</span>
+              </button>
+            </div>
             <textarea
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
